@@ -2,8 +2,9 @@
 namespace Lubos\Table\View\Helper;
 
 use Cake\View\Helper;
+use Cake\View\View;
 
-class Table extends Helper
+class TableHelper extends Helper
 {
 
     /**

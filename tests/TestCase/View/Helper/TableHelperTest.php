@@ -16,7 +16,6 @@ class TableHelperTest extends TestCase
      */
     public function setUp()
     {
-        $Controller = new Controller();
         $View = new View(null);
         $this->Table = new TableHelper($View);
     }
@@ -39,7 +38,7 @@ class TableHelperTest extends TestCase
     public function testDisplay()
     {
         $result = $this->Table->display();
-        $expected = '<table><tr></tr></table>';
+        $expected = '<table><tr><td>Whatever</td><td>Test</td></tr></table>';
         $this->assertEquals($result, $expected);
     }
 }
