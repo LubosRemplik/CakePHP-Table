@@ -1,0 +1,32 @@
+{
+    "name": "lubos/table",
+    "type": "cakephp-plugin",
+    "description": "CakePHP Table plugin helps you to create table via CakePHP helper",
+    "keywords": ["cakephp", "table", "plugin"],
+    "homepage": "https://github.com/LubosRemplik/CakePHP-Table",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lubos Remplik",
+            "homepage": "lubos.me"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "cakephp/plugin-installer": "*"
+    },
+    "require-dev": {
+        "cakephp/cakephp": "3.0.*-dev",
+        "phpunit/phpunit": "4.1.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Lubos\\Table\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Lubos\\Table\\Test\\": "tests"
+        }
+    }
+}
