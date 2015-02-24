@@ -61,6 +61,6 @@ If you want to help, pull requests are welcome.
 Please follow few rules:  
 
 - Fork & clone
-- Make bugfix or feature request
+- Code bugfix or feature
 - Follow [CakePHP coding standards](https://github.com/cakephp/cakephp-codesniffer)
 - Make tests and use phpunit to pass them
