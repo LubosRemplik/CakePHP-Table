@@ -29,7 +29,7 @@ class TableHelper extends Helper
      *
      * @var array
      */
-    public $_head = array();
+    protected $_head = array();
 
     /**
      * Table foot content
