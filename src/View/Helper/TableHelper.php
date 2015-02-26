@@ -15,7 +15,7 @@ class TableHelper extends Helper
      *
      * @var array
      */
-    public $helpers = ['Url', 'Html', 'Form'];
+    public $helpers = ['Url', 'Html', 'Form', 'Paginator'];
 
     /**
      * Table body content
@@ -51,6 +51,7 @@ class TableHelper extends Helper
      * @var array
      */
     protected $_defaultConfig = [
+        'paging' => true,
         'templates' => [
             'tableheader' => '<th{{attrs}}>{{content}}</th>',
             'tablecell' => '<td{{attrs}}>{{content}}</td>',
@@ -129,6 +130,12 @@ class TableHelper extends Helper
      */
     public function header($content = null, array $htmlAttributes = array())
     {
+        if ($this->_config['paging'] && !empty($this->request->params['paging'])) {
+            if (!is_array($content)) {
+                $content = array($content);
+            }
+            $content = $this->Paginator->sort($content[0], isset($content[1]) ? $content[1] : $content[1]);
+        }
         $this->_head[] = $this->formatTemplate('tableheader', [
             'content' => $content,
             'attrs' => $this->templater()->formatAttributes($htmlAttributes),
@@ -191,6 +198,16 @@ class TableHelper extends Helper
             'attrs' => $this->templater()->formatAttributes($htmlAttributes),
             'content' => implode($out)
         ]);
+        if ($this->_config['paging'] && !empty($this->request->params['paging'])) {
+            $out .= $this->Html->div('paginator', implode([
+                $this->Html->tag('ul', implode([
+                    $this->Paginator->prev('< ' . __('previous')),
+                    $this->Paginator->numbers(),
+                    $this->Paginator->next(__('next') . ' >')
+                ]), ['class' => 'pagination']),
+                $this->Html->tag('p', $this->Paginator->counter())
+            ]));
+        }
         return $out;
     }
 }
