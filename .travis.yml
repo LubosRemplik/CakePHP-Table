@@ -11,6 +11,3 @@ install:
 
 script:
   - phpunit
-
-notifications:
-  email: false

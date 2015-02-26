@@ -10,7 +10,7 @@ class TableHelperTest extends TestCase
 {
 
     /**
-     * testStartRow method
+     * testDisplay method
      */
     public function testDisplay()
     {
