@@ -22,21 +22,21 @@ class TableHelper extends Helper
      *
      * @var array
      */
-    protected $_body = array();
+    protected $_body = [];
 
     /**
      * Table head content
      *
      * @var array
      */
-    protected $_head = array();
+    protected $_head = [];
 
     /**
      * Table foot content
      *
      * @var array
      */
-    protected $_foot = array();
+    protected $_foot = [];
 
     /**
      * Last group used
@@ -46,12 +46,38 @@ class TableHelper extends Helper
     protected $_lastGroup;
 
     /**
+     * Rows number
+     *
+     * @var integer
+     */
+    protected $_row = 1;
+
+    /**
+     * Batch actions
+     *
+     * @var string
+     */
+    protected $_batchActions;
+
+    /**
+     * Show checkbox header
+     *
+     * @var bool
+     */
+    protected $_showCheckboxHeader = false;
+
+    /**
      * Default config for this class
      *
      * @var array
      */
     protected $_defaultConfig = [
         'paging' => true,
+        'batchActions' => [
+            'publish' => 'Publish records',
+            'unpublish' => 'Unpublish records',
+            'remove' => 'Remove records'
+        ],
         'templates' => [
             'tableheader' => '<th{{attrs}}>{{content}}</th>',
             'tablecell' => '<td{{attrs}}>{{content}}</td>',
@@ -88,10 +114,33 @@ class TableHelper extends Helper
      * @param array $options Array of options.
      * @return $this
      */
-    public function create(array $options = array())
+    public function create(array $options = [])
     {
         // empty body, head and foot
         $this->_body = $this->_head = $this->_foot = '';
+        return $this;
+    }
+
+    /**
+     * Adds batch actions to the table
+     *
+     * @param array $options Array of batch options.
+     * @param bool $useDefault Merge with default actions.
+     * @return $this
+     */
+    public function batchActions($options = [], $useDefault = true)
+    {
+        if ($useDefault) {
+            $options = array_merge($this->_config['batchActions'], $options);
+        }
+        $this->_batchActions = $this->Form->input('batch_action', [
+            'type' => 'select',
+            'label' => 'With Selected',
+            'options' => $options,
+            'empty' => 'Please select ...',
+        ]);
+        $this->_batchActions .= $this->Form->button('Submit', array('class' => 'batch-action-submit'));
+        $this->_showCheckboxHeader = true;
         return $this;
     }
 
@@ -105,7 +154,7 @@ class TableHelper extends Helper
      * @param array $options Array of options and html attributes.
      * @return $this
      */
-    public function startRow(array $options = array())
+    public function startRow(array $options = [])
     {
         $group = 'body';
         if (isset($options['group'])) {
@@ -117,6 +166,12 @@ class TableHelper extends Helper
                 'attrs' => $this->templater()->formatAttributes($options),
             ]);
         }
+        if ($group == 'body' && !empty($this->_batchActions)) {
+            $this->{'_' . $group}[] = $this->formatTemplate('tablecell', [
+                'content' => sprintf('<input type="checkbox" name="data[selected][]" value="%s" />', $this->_row),
+            ]);
+        }
+        $this->_row++;
         $this->_lastGroup = $group;
         return $this;
     }
@@ -128,8 +183,15 @@ class TableHelper extends Helper
      * @param array $htmlAttributes Html attributes passed to th.
      * @return $this
      */
-    public function header($content = null, array $htmlAttributes = array())
+    public function header($content = null, array $htmlAttributes = [])
     {
+        if ($this->_showCheckboxHeader) {
+            $this->_head[] = $this->formatTemplate('tableheader', [
+                'content' => '<input type="checkbox" class="trigger-check-all" />',
+                'attrs' => $this->templater()->formatAttributes(array('class' => 'nowrap')),
+            ]);
+            $this->_showCheckboxHeader = false;
+        }
         if ($this->_config['paging'] && !empty($this->request->params['paging'])) {
             if (!is_array($content)) {
                 $content = array($content);
@@ -150,7 +212,7 @@ class TableHelper extends Helper
      * @param array $htmlAttributes Html attributes passed to td.
      * @return $this
      */
-    public function cell($content = null, array $htmlAttributes = array())
+    public function cell($content = null, array $htmlAttributes = [])
     {
         $this->{'_' . $this->_lastGroup}[] = $this->formatTemplate('tablecell', [
             'content' => $content,
@@ -177,6 +239,9 @@ class TableHelper extends Helper
     public function display(array $htmlAttributes = [])
     {
         $out = [];
+        if ($this->_batchActions) {
+            $out[] = $this->Html->div('batch-actions', $this->_batchActions);
+        }
         if ($this->_head) {
             $out[] = $this->formatTemplate('tablehead', [
                 'content' => implode($this->_head)
